@@ -1,0 +1,53 @@
+<%- include("partials/header") %>
+
+<h2>Ticket #<%= ticket.id %></h2>
+
+<p><b>Customer:</b> <%= ticket.customer %></p>
+<p><b>Description:</b> <%= ticket.description %></p>
+<p><b>Status:</b> <%= ticket.status %></p>
+<p><b>Created:</b> <%= ticket.arrived %></p>
+
+<hr>
+
+<div class="message-list">
+  <h3>Messages</h3>
+
+  <% if (!messages || messages.length === 0) { %>
+    <p>No messages yet.</p>
+  <% } else { %>
+
+    <% messages.forEach(msg => { %>
+      <div class="message-item">
+
+        <div class="message-user">
+          <%= msg.from_user %>
+        </div>
+
+        <div>
+          <%= msg.body %>
+        </div>
+
+        <div class="message-time">
+          <%= new Date(msg.created_at).toLocaleString() %>
+        </div>
+
+      </div>
+    <% }) %>
+
+  <% } %>
+</div>
+
+<hr>
+
+<h3>Add Reply</h3>
+
+<form method="POST" action="/tickets/reply">
+  <input type="hidden" name="ticket_id" value="<%= ticket.id %>">
+
+  <textarea name="message" rows="4" style="width:300px;" required></textarea>
+  <br><br>
+
+  <button type="submit">Send</button>
+</form>
+
+<%- include("partials/footer") %>

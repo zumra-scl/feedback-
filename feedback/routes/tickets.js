@@ -1,0 +1,82 @@
+const express = require("express");
+const router = express.Router();
+
+const db = require("../db/db");
+
+router.get("/", async (req, res) => {
+  const [rows] = await db.query(`
+    SELECT
+      support_ticket.id,
+      support_ticket.arrived,
+      customer.name AS customer,
+      support_ticket.description,
+      ticket_status.description AS status
+    FROM support_ticket
+    JOIN customer
+      ON support_ticket.customer_id = customer.id
+    JOIN ticket_status
+      ON support_ticket.status = ticket_status.id
+    ORDER BY support_ticket.arrived DESC
+  `);
+
+  res.render("tickets", { tickets: rows });
+});
+
+router.get("/view", async (req, res) => {
+  const ticketId = req.query.id;
+
+  if (!ticketId) return res.status(400).send("Missing ticket id");
+
+  const [ticketRows] = await db.query(
+    `
+    SELECT
+      support_ticket.id,
+      support_ticket.arrived,
+      customer.name AS customer,
+      support_ticket.description,
+      ticket_status.description AS status
+    FROM support_ticket
+    JOIN customer
+      ON support_ticket.customer_id = customer.id
+    JOIN ticket_status
+      ON support_ticket.status = ticket_status.id
+    WHERE support_ticket.id = ?
+  `,
+    [ticketId],
+  );
+
+  const [messages] = await db.query(
+    `
+    SELECT *
+    FROM support_message
+    WHERE ticket_id = ?
+    ORDER BY created_at ASC
+  `,
+    [ticketId],
+  );
+
+  if (!ticketRows.length) {
+    return res.status(404).send("Ticket not found");
+  }
+
+  res.render("ticket", {
+    ticket: ticketRows[0],
+    messages,
+  });
+});
+
+router.post("/reply", async (req, res) => {
+  const { ticket_id, message } = req.body;
+
+  await db.query(
+    `
+    INSERT INTO support_message (ticket_id, from_user, body, reply_to, created_at)
+    VALUES (?, ?, ?, NULL, NOW())
+  `,
+    [ticket_id, 1, message],
+  );
+
+  res.redirect("/tickets/view?id=" + ticket_id);
+});
+
+module.exports = router;

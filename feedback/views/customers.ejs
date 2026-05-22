@@ -1,0 +1,27 @@
+<%- include("partials/header") %>
+
+<h2>Customers & Users</h2>
+
+<table>
+
+  <tr>
+    <th>Customer</th>
+    <th>User ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Admin</th>
+  </tr>
+
+  <% users.forEach(u => { %>
+    <tr>
+      <td><%= u.customer_name %></td>
+      <td><%= u.customer_id %></td>
+      <td><%= u.fullname %></td>
+      <td><%= u.email %></td>
+      <td><%= u.admin ? "Yes" : "No" %></td>
+    </tr>
+  <% }) %>
+
+</table>
+
+<%- include("partials/footer") %>
