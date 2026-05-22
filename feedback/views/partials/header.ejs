@@ -5,25 +5,33 @@
     <title>Support Portal</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
+
   <body>
     <header>
       <h1>Tuki- ja palauteportaali</h1>
 
       <nav>
-        <a
-          href="/customers"
-          class="<%= active === 'customers' ? 'active' : '' %>"
-          >Customers</a
-        >
-        <a href="/tickets" class="<%= active === 'tickets' ? 'active' : '' %>"
-          >Tickets</a
-        >
-        <a href="/feedback" class="<%= active === 'feedback' ? 'active' : '' %>"
-          >Feedback</a
-        >
+        <a href="/customers"
+           class="<%= (typeof active !== 'undefined' && active === 'customers') ? 'active' : '' %>">
+          Customers
+        </a>
+
+        <a href="/tickets"
+           class="<%= (typeof active !== 'undefined' && active === 'tickets') ? 'active' : '' %>">
+          Tickets
+        </a>
+
+        <a href="/feedback"
+           class="<%= (typeof active !== 'undefined' && active === 'feedback') ? 'active' : '' %>">
+          Feedback
+        </a>
+
+        <% if (session && session.user) { %>
+          <a href="/logout">Logout</a>
+        <% } else { %>
+          <a href="/login">Login</a>
+        <% } %>
       </nav>
     </header>
 
-    <main></main>
-  </body>
-</html>
+    <main>

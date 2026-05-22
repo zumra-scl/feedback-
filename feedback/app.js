@@ -1,25 +1,36 @@
 const express = require("express");
 const path = require("path");
+const session = require("express-session");
 
 const app = express();
 
 app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+
+app.use(
+  session({
+    secret: "feedback_secret",
+    resave: false,
+    saveUninitialized: false,
+  }),
+);
 
 app.use((req, res, next) => {
-  const page = req.path.split("/")[1];
-  res.locals.active = page || "customers";
+  res.locals.session = req.session;
   next();
 });
 
+app.use(express.static(path.join(__dirname, "public")));
+
+// ROUTES
+app.use("/", require("./routes/auth"));
 app.use("/customers", require("./routes/customers"));
 app.use("/tickets", require("./routes/tickets"));
 app.use("/feedback", require("./routes/feedback"));
 
 app.get("/", (req, res) => {
-  res.redirect("/customers");
+  res.redirect("/tickets");
 });
 
 app.listen(3000, () => {

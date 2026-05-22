@@ -10,6 +10,13 @@ const statusMap = {
   closed: 4,
 };
 
+router.use((req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  next();
+});
+
 router.get("/", async (req, res) => {
   const [rows] = await db.query(`
     SELECT
@@ -17,12 +24,11 @@ router.get("/", async (req, res) => {
       support_ticket.arrived,
       customer.name AS customer,
       support_ticket.description,
-      ticket_status.description AS status
+      ticket_status.description AS status,
+      support_ticket.handled
     FROM support_ticket
-    JOIN customer
-      ON support_ticket.customer_id = customer.id
-    JOIN ticket_status
-      ON support_ticket.status = ticket_status.id
+    JOIN customer ON support_ticket.customer_id = customer.id
+    JOIN ticket_status ON support_ticket.status = ticket_status.id
     ORDER BY support_ticket.arrived DESC
   `);
 
@@ -30,9 +36,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/view", async (req, res) => {
-  const ticketId = req.query.id;
-
-  if (!ticketId) return res.status(400).send("Missing ticket id");
+  const id = req.query.id;
 
   const [ticketRows] = await db.query(
     `
@@ -44,13 +48,11 @@ router.get("/view", async (req, res) => {
       ticket_status.description AS status,
       support_ticket.handled
     FROM support_ticket
-    JOIN customer
-      ON support_ticket.customer_id = customer.id
-    JOIN ticket_status
-      ON support_ticket.status = ticket_status.id
+    JOIN customer ON support_ticket.customer_id = customer.id
+    JOIN ticket_status ON support_ticket.status = ticket_status.id
     WHERE support_ticket.id = ?
   `,
-    [ticketId],
+    [id],
   );
 
   const [messages] = await db.query(
@@ -60,12 +62,8 @@ router.get("/view", async (req, res) => {
     WHERE ticket_id = ?
     ORDER BY created_at ASC
   `,
-    [ticketId],
+    [id],
   );
-
-  if (!ticketRows.length) {
-    return res.status(404).send("Ticket not found");
-  }
 
   res.render("ticket", {
     ticket: ticketRows[0],
