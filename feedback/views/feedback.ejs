@@ -9,15 +9,32 @@
   <% feedback.forEach(f => { %>
     <div style="background:white; padding:10px; margin-bottom:10px; border-radius:8px;">
 
-      <p><strong>Asiakas:</strong> <%= f.fullname || f.guest_name %></p>
+      <p>
+        <strong>Asiakas:</strong>
+        <%= f.fullname || f.guest_name %>
+      </p>
 
-      <p><strong>Email:</strong> <%= f.guest_email %></p>
+      <p>
+        <strong>Email:</strong>
+        <%= f.guest_email %>
+      </p>
 
-      <p><strong>Palaute:</strong> <%= f.feedback %></p>
+      <p>
+        <strong>Palaute:</strong>
+        <%= f.feedback %>
+      </p>
 
-      <p><strong>Status:</strong> <%= f.handled %></p>
+      <p>
+        <strong>Status:</strong>
+        <span style='color: <%= f.handled ? 'red' : 'green' %>;'>
+          <%= f.handled ? 'Closed' : 'Open' %>
+        </span>
+      </p>
 
-      <p><strong>Päivämäärä:</strong> <%= f.arrived %></p>
+      <p>
+        <strong>Päivämäärä:</strong>
+        <%= f.arrived %>
+      </p>
 
     </div>
   <% }) %>

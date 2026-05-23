@@ -32,7 +32,10 @@ router.get("/", async (req, res) => {
     ORDER BY support_ticket.arrived DESC
   `);
 
-  res.render("tickets", { tickets: rows });
+  res.render("tickets", {
+    tickets: rows,
+    active: "tickets",
+  });
 });
 
 router.get("/view", async (req, res) => {
@@ -68,6 +71,7 @@ router.get("/view", async (req, res) => {
   res.render("ticket", {
     ticket: ticketRows[0],
     messages,
+    active: "tickets",
   });
 });
 
@@ -79,7 +83,7 @@ router.post("/reply", async (req, res) => {
     INSERT INTO support_message (ticket_id, from_user, body, reply_to, created_at)
     VALUES (?, ?, ?, NULL, NOW())
   `,
-    [ticket_id, 1, message],
+    [ticket_id, req.session.user.id, message],
   );
 
   res.redirect("/tickets/view?id=" + ticket_id);

@@ -17,6 +17,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
+  res.locals.active = null;
   res.locals.session = req.session;
   next();
 });
@@ -27,6 +28,7 @@ app.use("/", require("./routes/auth"));
 app.use("/customers", require("./routes/customers"));
 app.use("/tickets", require("./routes/tickets"));
 app.use("/feedback", require("./routes/feedback"));
+app.use("/users", require("./routes/users"));
 
 app.get("/", (req, res) => {
   res.redirect("/tickets");

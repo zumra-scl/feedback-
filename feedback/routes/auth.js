@@ -4,16 +4,16 @@ const bcrypt = require("bcrypt");
 
 const db = require("../db/db");
 
-
 router.get("/login", (req, res) => {
   res.render("login");
 });
-
 
 router.post("/login", async (req, res) => {
   const { identifier, password } = req.body;
 
   try {
+    console.log("LOGIN BODY:", req.body);
+
     const [rows] = await db.query(
       "SELECT * FROM system_user WHERE id = ? OR email = ?",
       [identifier, identifier],
@@ -26,6 +26,14 @@ router.post("/login", async (req, res) => {
     }
 
     console.log("LOGIN USER:", user);
+
+    if (!password) {
+      return res.send("Password missing");
+    }
+
+    if (!user.password) {
+      return res.send("User has no password in DB");
+    }
 
     const match = await bcrypt.compare(password, user.password);
 
@@ -49,7 +57,6 @@ router.post("/login", async (req, res) => {
     return res.send("Server error");
   }
 });
-
 
 router.get("/logout", (req, res) => {
   req.session.destroy(() => {

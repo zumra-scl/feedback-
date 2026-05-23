@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-
 const db = require("../db/db");
 
 router.get("/", async (req, res) => {
   const [rows] = await db.query(`
     SELECT
+      feedback.id,
       feedback.arrived,
       system_user.fullname,
       feedback.guest_name,
@@ -18,12 +18,10 @@ router.get("/", async (req, res) => {
     ORDER BY feedback.arrived DESC
   `);
 
-  res.render("feedback", { feedback: rows });
-});
-
-router.get("/feedback", async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM feedback");
-  res.render("feedback", { feedback: rows });
+  res.render("feedback", {
+    feedback: rows,
+    active: "feedback",
+  });
 });
 
 module.exports = router;

@@ -1,0 +1,15 @@
+<h2>Edit User</h2>
+
+<form method="POST" action="/users/<%= user.id %>">
+  <input name="fullname" value="<%= user.fullname %>" placeholder="Full name" />
+
+  <input name="email" value="<%= user.email %>" placeholder="Email" />
+
+  <input
+    name="password"
+    type="password"
+    placeholder="Leave empty to keep password"
+  />
+
+  <button type="submit">Save</button>
+</form>
